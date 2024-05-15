@@ -1,0 +1,5 @@
+#!/bin/bash
+ls -t | head -1 | xargs chmod u+x
+git add .
+git commit -m "complete task"
+git push
