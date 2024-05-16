@@ -2,11 +2,13 @@
 
 from datetime import datetime
 from uuid import uuid4
+import models
 
 """
 BaseModel class
 defines all common attributes/methods for other classes
 """
+
 
 class BaseModel:
     """defines all common attributes/methods for other classes"""
@@ -15,21 +17,25 @@ class BaseModel:
         if kwargs:
             for k, v in kwargs.items():
                 if k == "created_at" or k == "updated_at":
-                    v = datetime.strptime(v, "%Y-%m-%dT%H:%M:%S.%f")
+                    v = datetime.fromisoformat(v)
                 if k != "__class__":
                     setattr(self, k, v)
-        self.id = str(uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
+        else:
+            self.id = str(uuid4())
+            self.created_at = datetime.now()
+            self.updated_at = datetime.now()
+            models.storage.new(self)
 
     def __str__(self):
         """string representation for BaseModel"""
         return "[{:s}] ({:s}) {}".format(self.__class__.__name__, self.id,
                                          self.__dict__)
+
     def save(self):
         """updates updated_at with current time"""
         self.updated_at = datetime.now()
-    
+        models.storage.save()
+
     def to_dict(self):
         """returns dictionary containing all keys/values of __dict__"""
         new_dict = self.__dict__.copy()
