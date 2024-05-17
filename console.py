@@ -5,12 +5,13 @@
 import cmd
 from models.base_model import BaseModel
 from models import storage
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
     """ Class HBNBCommand """
     prompt = '(hbnb) '
-    __classes = {"BaseModel": BaseModel}
+    __classes = {"BaseModel": BaseModel, "User": User}
 
     def do_quit(self, arg):
         """Quit command to exit the program\n"""
@@ -110,8 +111,8 @@ class HBNBCommand(cmd.Cmd):
             print("** value missing **")
             return
         _, _, a, v = args
-        if "\"" in v:
-            v = v.replace("\"", "")
+        if '"' in v:
+            v = v.replace('"', "")
         try:
             if "." in v:
                 v = float(v)
