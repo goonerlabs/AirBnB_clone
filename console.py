@@ -21,7 +21,42 @@ class HBNBCommand(cmd.Cmd):
                 "City": City, "Amenity": Amenity, "Place": Place,
                 "Review": Review
                 }
+    def default(self, arg):
+        """handle unorthodox commands"""
+        try:
+            cls_name, command = arg.split('.', 1)
+            if cls_name not in HBNBCommand.__classes:
+                print("** class doesn't exist **")
+                return
+            if command.startswith("all()"):
+                self.do_all(cls_name)
+            elif command.startswith("count()"):
+                self.do_count(cls_name)
+            elif command[0:4] == "show":
+                id = command[6:-2]
+                self.do_show("{} {}".format(cls_name, id))
+            elif command.startswith("destroy()"):
+                id = command.split()[1]
+                self.do_destroy("{} {}".format(cls_name, id))
+            elif command.startswith("update()"):
+                args = command[7: -1]
+                if '{' in args:
+                    id, dict_str = args.split(',')
+                    id = id.strip().strip('"')
+                    attr_dict = eval(dict_str.strip())
+                    for k, v in attr_dict.items():
+                        self.do_update("{} {} {} {}".format(cls_name, id, k, v))
+                else:
+                    id, attr_name, v = map(str.strip, args.split(','))
+                    id = id.strip('"')
+                    attr_name = attr_name.strip('"')
+                    v = v.strip('"')
+                    self.do_update("{} {} {} {}".format(cls_name, id, attr_name, v))
+        except Exception:
+            print("*** Unknown syntax: {}".format(arg))
+            return False
 
+    
     def do_quit(self, arg):
         """Quit command to exit the program\n"""
         return True
@@ -131,6 +166,17 @@ class HBNBCommand(cmd.Cmd):
             pass
         setattr(storage.all()[k], a, v)
         storage.all()[k].save()
+
+    def do_count(self, arg):
+        """Returns the number of instances of a class"""
+        if arg not in HBNBCommand.__classes:
+            print("** class doesn't exist **")
+            return
+        count = 0
+        for obj in storage.all().values():
+            if isinstance(obj, HBNBCommand.__classes[arg]):
+                count += 1
+        print(count)
 
 
 if __name__ == '__main__':
