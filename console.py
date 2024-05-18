@@ -3,6 +3,7 @@
 """" Entry point of the command interpreter """
 
 import cmd
+import re
 from models.base_model import BaseModel
 from models import storage
 from models.user import User
@@ -39,14 +40,15 @@ class HBNBCommand(cmd.Cmd):
                 id = command[9:-2]
                 print(id)
                 self.do_destroy("{} {}".format(cls_name, id))
-            elif command.startswith("update()"):
+            elif command[0:6] == "update":
                 args = command[7: -1]
                 if '{' in args:
-                    id, dict_str = args.split(',')
-                    id = id.strip().strip('"')
-                    attr_dict = eval(dict_str.strip())
-                    for k, v in attr_dict.items():
-                        self.do_update("{} {} {} {}".format(cls_name, id, k, v))
+                    p = re.search(r'update\("([^"]+)", ({.*})\)', command)
+                    if p:
+                        id = p.group(1)
+                        attr_dict = eval(p.group(2))
+                        for k, v in attr_dict.items():
+                            self.do_update("{} {} {} {}".format(cls_name, id, k, v))
                 else:
                     id, attr_name, v = map(str.strip, args.split(','))
                     id = id.strip('"')
