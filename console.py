@@ -35,8 +35,9 @@ class HBNBCommand(cmd.Cmd):
             elif command[0:4] == "show":
                 id = command[6:-2]
                 self.do_show("{} {}".format(cls_name, id))
-            elif command.startswith("destroy()"):
-                id = command.split()[1]
+            elif command[0:7] == "destroy":
+                id = command[9:-2]
+                print(id)
                 self.do_destroy("{} {}".format(cls_name, id))
             elif command.startswith("update()"):
                 args = command[7: -1]
